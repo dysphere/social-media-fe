@@ -21,7 +21,7 @@ const Signup = () => {
         try {
             event.preventDefault();
             const formData = form.getValues();
-            await fetch("https://social-media-be-oqoe.onrender.com/signup",
+            await fetch("http://localhost:3000/signup",
                 {
                 method: "POST",
                 headers: {
