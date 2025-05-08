@@ -15,13 +15,14 @@ export const AuthProvider = ({children}) => {
 
   useEffect(() => {
       if (isAuth) {
-      fetch("https://social-media-be-oqoe.onrender.com/user/current",
+      fetch("http://localhost:3000/user/current",
           {
             credentials: 'include',
+            mode: "cors",
           }
       )
         .then((response) => response.json())
-        .then((response) => setUser(response.user))
+        .then((response) => {setUser(response.user);})
         .catch((error) => console.error(error));
   }
     }, [isAuth]);
