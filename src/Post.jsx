@@ -4,9 +4,12 @@ import Header from "./Header"
 import { Textarea, Button } from "@mantine/core"
 import { useForm } from "@mantine/form"
 
-const Comment = () => {
-    
-    return(<div></div>)
+const Comment = ({content, createdAt, author}) => {
+    return(<div>
+        <p>{content}</p>
+        <p>{createdAt}</p>
+        <p>{author}</p>
+    </div>)
 }
 
 const Post = () => {
@@ -62,7 +65,10 @@ const Post = () => {
     const commentscards = 
       !error && !load && comments ? comments.map((comment) => (
         <div key={comment.id}>
-            
+            <Comment
+            content={comment.content}
+            createdAt={comment.createdAt}
+            author={comment.author.username}/>
         </div>
       )) : null;
 
@@ -78,7 +84,7 @@ const Post = () => {
     />
             <Button type="submit">Submit</Button>
         </form>
-        <div></div>
+        <div>{commentscards}</div>
     </div>)
 }
 

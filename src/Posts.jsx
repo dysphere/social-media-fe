@@ -7,10 +7,13 @@ import { useForm } from "@mantine/form";
 
 //redirect to new post page after making post
 
-const Post = ({id, content, author, like}) => {
+const Post = ({id, content, author, createdAt}) => {
+    const postLink = `/post/${id}`
 
     return (<div>
-        <Link></Link>
+        <Link to={postLink}>{content}</Link>
+        <p>{author}</p>
+        <p>{createdAt}</p>
     </div>)
 }
 
@@ -23,14 +26,15 @@ const Posts = () => {
     const [load, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch("http://localhost:3000/post", 
+        fetch("http://localhost:3000/post/followed", 
             { 
             mode: "cors",
             credentials: 'include',
         })
           .then((response) => response.json())
-          .then((response) => console.log(response))
-          .catch((error) => console.error(error));
+          .then((response) => {console.log(response.posts); setPosts(response.posts);})
+          .catch((error) => setError(error))
+          .finally(() => setLoading(false));
       }, []);
 
       const form = useForm({
@@ -63,6 +67,18 @@ const Posts = () => {
         }
     }
 
+    const postscards = 
+          !error && !load && posts ? posts.map((post) => (
+            <div key={post.id}>
+                <Post
+                id={post.id}
+                content={post.content}
+                createdAt={post.createdAt}
+                author={post.author.username}
+                />
+            </div>
+          )) : null;
+
     return (<div>
         <form onSubmit={handleNewPost}>
          <Textarea
@@ -72,6 +88,7 @@ const Posts = () => {
     />
     <Button type="submit">Submit</Button>
     </form>
+    <div>{postscards}</div>
     </div>)
 }
 

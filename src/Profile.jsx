@@ -19,6 +19,7 @@ const Profile = () => {
     const { id } = useParams();
     const [profile, setProfile] = useState({});
     const [user, setUser] = useState({});
+    const [follows, setFollows] = useState([]);
     const [posts, setPosts] = useState([]);
     const [error, setError] = useState(false);
     const [load, setLoading] = useState(true);
@@ -29,10 +30,27 @@ const Profile = () => {
                     credentials: 'include',
                  })
               .then((response) => response.json())
-              .then((response) => {console.log(response.profile.user.posts); setProfile(response.profile); setUser(response.profile.user); setPosts(response.profile.user.posts);})
+              .then((response) => {console.log(response.profile); setProfile(response.profile); setUser(response.profile.user); setFollows(response.profile.user.followedBy); setPosts(response.profile.user.posts);})
               .catch((error) => setError(error))
               .finally(() => setLoading(false));
           }, [id]);
+
+          const toggleFollow = async (id) => {
+            try {
+                const follow = await fetch(`http://localhost:3000/user/${id}/follow`,
+                    {
+                    mode: "cors" ,
+                    credentials: 'include',
+                    method: "POST",
+                    }
+                );
+                console.log(follow);
+    
+            }
+            catch(err) {
+                console.error('Error toggling follow', err);
+            }
+        }
 
           const postscards = 
           !error && !load && posts ? posts.map((post) => (
@@ -49,6 +67,7 @@ const Profile = () => {
         <img
   src={profile.avatar} />
   <p>{user.username}</p>
+  <Button onClick={() => toggleFollow(user.id)}>Follow</Button>
   <p>{profile.bio}</p>
   <div>{postscards}</div>
     </div>)
