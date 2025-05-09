@@ -8,7 +8,7 @@ import { useForm } from "@mantine/form";
 //redirect to new post page after making post
 
 const Post = ({id, content, author, like}) => {
-    
+
     return (<div>
         <Link></Link>
     </div>)
@@ -59,7 +59,7 @@ const Posts = () => {
 
         }
         catch(err) {
-            console.error('Error signing up', err);
+            console.error('Error making a new post', err);
         }
     }
 

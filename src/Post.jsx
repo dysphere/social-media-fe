@@ -1,11 +1,19 @@
 import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import Header from "./Header"
+import { Textarea, Button } from "@mantine/core"
+import { useForm } from "@mantine/form"
+
+const Comment = () => {
+    
+    return(<div></div>)
+}
 
 const Post = () => {
 
     const { id } = useParams();
     const [post, setPost] = useState({});
+    const [author, setAuthor] = useState({});
     const [comments, setComments] = useState([]);
     const [likes, setLikes] = useState([]);
     const [error, setError] = useState(false);
@@ -17,12 +25,61 @@ const Post = () => {
                 credentials: 'include',
              })
           .then((response) => response.json())
-          .then((response) => {console.log(response.post); setPost(response.post)})
+          .then((response) => {console.log(response.post); setPost(response.post); setLikes(response.post.like); setComments(response.post.comment); setAuthor(response.post.author)})
           .catch((error) => setError(error))
           .finally(() => setLoading(false));
       }, [id]);
 
-    return (<div></div>)
+      const form = useForm({
+        mode: 'uncontrolled',
+        initialValues: {
+          content: '',
+        },
+      });
+
+      const handleNewComment = async (id) => {
+        try {
+            const formData = form.getValues();
+            const comment = await fetch(`http://localhost:3000/comment/${id}/new`,
+                {
+                mode: "cors" ,
+                credentials: 'include',
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                  },
+                body: JSON.stringify(formData),
+                }
+            );
+            console.log(comment);
+
+        }
+        catch(err) {
+            console.error('Error making a new comment', err);
+        }
+    }
+
+    const commentscards = 
+      !error && !load && comments ? comments.map((comment) => (
+        <div key={comment.id}>
+            
+        </div>
+      )) : null;
+
+    return (<div>
+        <p>{author.username}</p>
+        <p>{post.content}</p>
+        <p>{post.createdAt}</p>
+        <p>Comment</p>
+        <form onSubmit={(e) => {e.preventDefault(); handleNewComment(post.id);}}>
+            <Textarea 
+      {...form.getInputProps('content')}
+      key={form.key('content')}
+    />
+            <Button type="submit">Submit</Button>
+        </form>
+        <div></div>
+    </div>)
 }
 
 const PostPage = () => {
