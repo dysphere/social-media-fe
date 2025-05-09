@@ -40,6 +40,7 @@ const Users = () => {
             profileId={user.profile.id}/>
         </div>
       )) : null;
+      
     return (<div>{userscards}</div>)
 }
 

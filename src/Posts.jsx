@@ -8,8 +8,9 @@ import { useForm } from "@mantine/form";
 //redirect to new post page after making post
 
 const Post = ({id, content, author, like}) => {
+    
     return (<div>
-
+        <Link></Link>
     </div>)
 }
 
@@ -18,6 +19,8 @@ const Posts = () => {
     const navigate = useNavigate();
 
     const [posts, setPosts] = useState([]);
+    const [error, setError] = useState(false);
+    const [load, setLoading] = useState(true);
 
     useEffect(() => {
         fetch("http://localhost:3000/post", 
