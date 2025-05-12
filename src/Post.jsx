@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useContext } from "react"
+import { AuthContext } from "./AuthContext"
 import { useParams } from "react-router-dom"
 import Header from "./Header"
 import { Textarea, Button } from "@mantine/core"
@@ -15,12 +16,16 @@ const Comment = ({content, createdAt, author}) => {
 const Post = () => {
 
     const { id } = useParams();
+    const { user } = useContext(AuthContext);
+
     const [post, setPost] = useState({});
+    const [postContent, setPostContent] = useState("");
     const [author, setAuthor] = useState({});
     const [comments, setComments] = useState([]);
     const [likes, setLikes] = useState([]);
     const [error, setError] = useState(false);
     const [load, setLoading] = useState(true);
+    const [edit, setEdit] = useState(false);
 
     useEffect(() => {
         fetch(`http://localhost:3000/post/${id}`,
@@ -28,10 +33,17 @@ const Post = () => {
                 credentials: 'include',
              })
           .then((response) => response.json())
-          .then((response) => {console.log(response.post); setPost(response.post); setLikes(response.post.like); setComments(response.post.comment); setAuthor(response.post.author)})
+          .then((response) => {setPost(response.post); setPostContent(response.post.content); setLikes(response.post.like); setComments(response.post.comment); setAuthor(response.post.author); EditPostForm.setFieldValue('content', response.post.content);})
           .catch((error) => setError(error))
           .finally(() => setLoading(false));
       }, [id]);
+
+      const EditPostForm = useForm({
+        mode: 'uncontrolled',
+        initialValues: {
+          content: '',
+        },
+      });
 
       const form = useForm({
         mode: 'uncontrolled',
@@ -62,6 +74,55 @@ const Post = () => {
         }
     }
 
+    const handleEdit = () => {
+        setEdit(true);
+    }
+
+    const cancelEdit = () => {
+        setEdit(false);
+    }
+
+    const handleDelete = async (id) => {
+        try {
+            await fetch(`http://localhost:3000/post/${id}/delete`,
+                {
+                mode: "cors" ,
+                credentials: 'include',
+                method: "DELETE",
+                }
+            );
+
+        }
+        catch(err) {
+            console.error('Error deleting post', err);
+        }
+    }
+
+    const submitEdit = async (id) => {
+        try {
+            const formData = EditPostForm.getValues();
+            const post = await fetch(`http://localhost:3000/post/${id}/update`,
+                {
+                mode: "cors" ,
+                credentials: 'include',
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                  },
+                body: JSON.stringify(formData),
+                }
+            );
+            const postData = await post.json();
+            setPostContent(postData.post.content);
+            setEdit(false);
+            console.log(post);
+
+        }
+        catch(err) {
+            console.error('Error editing post', err);
+        }
+    }
+
     const commentscards = 
       !error && !load && comments ? comments.map((comment) => (
         <div key={comment.id}>
@@ -74,8 +135,21 @@ const Post = () => {
 
     return (<div>
         <p>{author.username}</p>
-        <p>{post.content}</p>
+        {user.username === author.username && edit ?<div> 
+        <form onSubmit={(e) => {e.preventDefault(); submitEdit(post.id);}}>
+        <Textarea
+        {...EditPostForm.getInputProps('content')}
+        key={EditPostForm.key('content')}/>
+        <Button onClick={cancelEdit}>Cancel</Button>
+        <Button type="submit">Submit</Button>
+        </form>
+        <p>{post.createdAt}</p></div> : user.username === author.username && !edit ? 
+        <div> <p>{postContent}</p>
         <p>{post.createdAt}</p>
+        <Button onClick={handleEdit}>Edit</Button>
+        <Button onClick={handleDelete}>Delete</Button></div> : 
+        <div> <p>{postContent}</p>
+        <p>{post.createdAt}</p></div>}
         <p></p>
         <p></p>
         <p>Comment</p>

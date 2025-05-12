@@ -21,7 +21,7 @@ const Post = ({id, content, createdAt, comment, like}) => {
 const Profile = () => {
 
     const { id } = useParams();
-    const {user, isAuth} = useContext(AuthContext);
+    const { user } = useContext(AuthContext);
 
     const [profile, setProfile] = useState({});
     const [person, setPerson] = useState({});
