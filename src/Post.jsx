@@ -76,6 +76,8 @@ const Post = () => {
         <p>{author.username}</p>
         <p>{post.content}</p>
         <p>{post.createdAt}</p>
+        <p></p>
+        <p></p>
         <p>Comment</p>
         <form onSubmit={(e) => {e.preventDefault(); handleNewComment(post.id);}}>
             <Textarea 

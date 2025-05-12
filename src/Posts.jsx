@@ -7,13 +7,15 @@ import { useForm } from "@mantine/form";
 
 //redirect to new post page after making post
 
-const Post = ({id, content, author, createdAt}) => {
+const Post = ({id, content, author, createdAt, comment, like}) => {
     const postLink = `/post/${id}`
 
     return (<div>
-        <Link to={postLink}>{content}</Link>
-        <p>{author}</p>
+        <p>{content}</p>
         <p>{createdAt}</p>
+        <p>{author}</p>
+        <Link to={postLink}>{comment} comment(s)</Link>
+        <p>{like} like(s)</p>
     </div>)
 }
 
@@ -75,6 +77,8 @@ const Posts = () => {
                 content={post.content}
                 createdAt={post.createdAt}
                 author={post.author.username}
+                comment={post.comment.length}
+                like={post.like.length}
                 />
             </div>
           )) : null;

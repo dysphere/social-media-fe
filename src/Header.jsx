@@ -15,6 +15,7 @@ const Header = () => {
     const auth_links = [
         { link: '/posts', label: 'Posts' },
         { link: '/users', label: 'Users' },
+        {link: user?.profile?.id ?  `/profile/${user.profile.id}` : '#', label: 'Profile'},
     ];
 
       const noauth_items = noauth_links.map((link) => (
