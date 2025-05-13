@@ -5,9 +5,23 @@ import Header from "./Header"
 import { Textarea, Button } from "@mantine/core"
 import { useForm } from "@mantine/form"
 
-const Comment = ({content, createdAt, author}) => {
+const Comment = ({id, content, createdAt, author, edit, 
+    handleEditComment, handleDeleteComment, handleSubmitCommentEdit}) => {
+
+    const { user } = useContext(AuthContext);
+
     return(<div>
-        <p>{content}</p>
+        {user.username === author && edit ? 
+        <form onSubmit={(e) => {e.preventDefault(); handleSubmitCommentEdit(id);}}>
+            <Textarea/>
+            <Button type="submit">Submit</Button>
+        </form> : user.username === author && !edit ? 
+        <div>
+            <p>{content}</p>
+            <Button onClick={handleEditComment}>Edit</Button>
+            <Button onClick={handleDeleteComment}>Delete</Button>
+            </div> :
+        <p>{content}</p> }
         <p>{createdAt}</p>
         <p>{author}</p>
     </div>)
@@ -33,12 +47,29 @@ const Post = () => {
                 credentials: 'include',
              })
           .then((response) => response.json())
-          .then((response) => {setPost(response.post); setPostContent(response.post.content); setLikes(response.post.like); setComments(response.post.comment); setAuthor(response.post.author); EditPostForm.setFieldValue('content', response.post.content);})
+          .then((response) => {
+            const comment_edit = response.post.comment.map((comment) => {
+                return {...comment, edit: false};
+            });
+            console.log(comment_edit);
+            setPost(response.post); 
+            setPostContent(response.post.content); 
+            setLikes(response.post.like); 
+            setComments(comment_edit); 
+            setAuthor(response.post.author); 
+            EditPostForm.setFieldValue('content', response.post.content);})
           .catch((error) => setError(error))
           .finally(() => setLoading(false));
       }, [id]);
 
       const EditPostForm = useForm({
+        mode: 'uncontrolled',
+        initialValues: {
+          content: '',
+        },
+      });
+
+      const EditCommentForm = useForm({
         mode: 'uncontrolled',
         initialValues: {
           content: '',
@@ -122,6 +153,8 @@ const Post = () => {
             console.error('Error editing post', err);
         }
     }
+
+
 
     const commentscards = 
       !error && !load && comments ? comments.map((comment) => (

@@ -34,7 +34,8 @@ const Posts = () => {
             credentials: 'include',
         })
           .then((response) => response.json())
-          .then((response) => {console.log(response.posts); setPosts(response.posts);})
+          .then((response) => {console.log(response.posts); 
+            setPosts(response.posts);})
           .catch((error) => setError(error))
           .finally(() => setLoading(false));
       }, []);

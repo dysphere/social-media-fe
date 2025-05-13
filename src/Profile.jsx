@@ -38,7 +38,13 @@ const Profile = () => {
                     credentials: 'include',
                  })
               .then((response) => response.json())
-              .then((response) => {setProfile(response.profile); setBio(response.profile.bio); setPerson(response.profile.user); setFollows(response.profile.user.followedBy); setPosts(response.profile.user.posts); form.setFieldValue('bio', response.profile.bio);})
+              .then((response) => {
+                setProfile(response.profile); 
+                setBio(response.profile.bio); 
+                setPerson(response.profile.user); 
+                setFollows(response.profile.user.followedBy); 
+                setPosts(response.profile.user.posts); 
+                form.setFieldValue('bio', response.profile.bio);})
               .catch((error) => setError(error))
               .finally(() => setLoading(false));
           }, [id]);
