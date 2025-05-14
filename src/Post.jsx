@@ -6,14 +6,22 @@ import { Textarea, Button } from "@mantine/core"
 import { useForm } from "@mantine/form"
 
 const Comment = ({id, content, createdAt, author, edit, 
-    handleEditComment, handleDeleteComment, handleSubmitCommentEdit}) => {
+    handleEditComment, handleDeleteComment, handleSubmitCommentEdit, handleCancelForm}) => {
 
     const { user } = useContext(AuthContext);
+
+    const form = useForm({
+        mode: "uncontrolled",
+        initialValues: {
+          content: content,
+        },
+      });
 
     return(<div>
         {user.username === author && edit ? 
         <form onSubmit={(e) => {e.preventDefault(); handleSubmitCommentEdit(id);}}>
             <Textarea/>
+            <Button onClick={handleCancelForm}>Cancel</Button>
             <Button type="submit">Submit</Button>
         </form> : user.username === author && !edit ? 
         <div>
@@ -154,7 +162,42 @@ const Post = () => {
         }
     }
 
+    const CommentStartEdit = (id) => {
+        setComments(comments.map((comment) => {
+            if (id === comment.id) {
+                return {...comment, edit: true};
+            }
+        }));
+    }
 
+    const CommentFormCancel = (id) => {
+        setComments(comments.map((comment) => {
+            if (id === comment.id) {
+                return {...comment, edit: false};
+            }
+        }));
+    }
+
+    const CommentDelete = async (id) => {
+        try {
+            await fetch(`http://localhost:3000/comment/${id}/delete`,
+                {
+                mode: "cors" ,
+                credentials: 'include',
+                method: "DELETE",
+                }
+            );
+            setComments(comments.filter((comment) => {
+                comment.id != id
+            }));
+
+        }
+        catch(err) {
+            console.error('Error deleting comment', err);
+        }
+    }
+
+    const CommentEdit = (id) => {}
 
     const commentscards = 
       !error && !load && comments ? comments.map((comment) => (
@@ -162,7 +205,13 @@ const Post = () => {
             <Comment
             content={comment.content}
             createdAt={comment.createdAt}
-            author={comment.author.username}/>
+            author={comment.author.username}
+            edit={comment.edit}
+            id={comment.id}
+            handleEditComment={() => CommentStartEdit(comment.id)}
+            handleDeleteComment={() => CommentDelete(comment.id)}
+            handleSubmitCommentEdit={() => CommentEdit(comment.id)}
+            handleCancelForm={() => CommentFormCancel(comment.id)}/>
         </div>
       )) : null;
 
