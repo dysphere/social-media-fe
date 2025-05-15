@@ -4,23 +4,25 @@ import Header from "./Header";
 import { Link, useNavigate } from "react-router-dom";
 import { Textarea, Button } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import heartBlack from "../src/assets/heart-black.svg"
+import heartOutline from '../src/assets/heart-outline.svg';
 
 //redirect to new post page after making post
 
 const Post = ({id, content, author, createdAt, comment, like, handleLike, liked}) => {
     const postLink = `/post/${id}`
 
-    return (<div>
+    return (<div className="flex flex-col w-96">
         <p>{content}</p>
         <p>Posted: {createdAt}</p>
         <p>By: {author}</p>
         <div className="flex flex-row gap-4">
         <div className="flex flex-row gap-1">
         {liked ? <button onClick={handleLike} className="size-4">
-  <img src="src/assets/heart-black.svg" alt="Button Image"/>
+  <img src={heartBlack} alt="Button Image"/>
     </button> : 
         <button onClick={handleLike} className="size-4">
-  <img src="src/assets/heart-outline.svg" alt="Button Image"/>
+  <img src={heartOutline} alt="Button Image"/>
     </button>}
     <p>{like} like(s)</p>
     </div>
@@ -73,6 +75,8 @@ const Posts = () => {
                 body: JSON.stringify(formData),
                 }
             );
+            const data = post.json();
+            navigate(`/post/${data.id}`);
             console.log(post);
 
         }
@@ -143,14 +147,16 @@ const Posts = () => {
 
     return (<div>
         <form onSubmit={handleNewPost}>
+            <div className="flex flex-col items-center">
          <Textarea
       label="New Post"
       {...form.getInputProps('content')}
       key={form.key('content')}
     />
     <Button type="submit">Submit</Button>
+    </div>
     </form>
-    <div>{postscards}</div>
+    <div className="flex flex-row items-center">{postscards}</div>
     </div>)
 }
 

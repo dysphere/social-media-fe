@@ -5,6 +5,8 @@ import { Link } from "react-router-dom";
 import Header from "./Header";
 import { Textarea, Button } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import heartBlack from "../src/assets/heart-black.svg"
+import heartOutline from '../src/assets/heart-outline.svg';
 
 const Post = ({id, content, createdAt, comment, like}) => {
 
@@ -39,6 +41,7 @@ const Profile = () => {
                  })
               .then((response) => response.json())
               .then((response) => {
+                console.log(response.profile.user.followedBy);
                 setProfile(response.profile); 
                 setBio(response.profile.bio); 
                 setPerson(response.profile.user); 
@@ -118,11 +121,13 @@ const Profile = () => {
         }
     }
 
-    return (<div>
+    return (<div className="flex flex-col items-center">
         <img
   src={profile.avatar} />
+  <div className="flex flex-col">
   <p>{user.username}</p>
   <Button onClick={() => toggleFollow(user.id)}>Follow</Button>
+  </div>
  {user.username === person.username && edit ? 
  <form onSubmit={(e) => {e.preventDefault(); submitEdit(profile.id);}}>
     <Textarea

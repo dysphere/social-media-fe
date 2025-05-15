@@ -4,6 +4,8 @@ import { useParams } from "react-router-dom"
 import Header from "./Header"
 import { Textarea, Button } from "@mantine/core"
 import { useForm } from "@mantine/form"
+import heartBlack from "../src/assets/heart-black.svg"
+import heartOutline from '../src/assets/heart-outline.svg';
 
 const Comment = ({id, content, createdAt, author, edit, 
     handleEditComment, handleDeleteComment, handleSubmitCommentEdit, handleCancelForm}) => {
@@ -59,7 +61,7 @@ const Post = () => {
             const comment_edit = response.post.comment.map((comment) => {
                 return {...comment, edit: false};
             });
-            console.log(comment_edit);
+            console.log(response.post.like);
             setPost(response.post); 
             setPostContent(response.post.content); 
             setLikes(response.post.like); 
@@ -199,6 +201,30 @@ const Post = () => {
 
     const CommentEdit = (id) => {}
 
+    //work on like function later
+
+    const handleLike = async (id) => {
+         try {
+            await fetch(`http://localhost:3000/post/${id}/like`,
+                {
+                mode: "cors" ,
+                credentials: 'include',
+                method: "PUT",
+                }
+            );
+            const like_include_user = likes.some((liker) => {return liker.username === user.username});
+            if (like_include_user) {
+                setLikes(likes.filter((liker) => liker.username != user.username));
+            }
+            else {
+                 setLikes([...likes, user]);
+            }
+        }
+        catch(err) {
+            console.error('Error toggling like', err);
+        }
+    }
+
     const commentscards = 
       !error && !load && comments ? comments.map((comment) => (
         <div key={comment.id}>
@@ -215,35 +241,55 @@ const Post = () => {
         </div>
       )) : null;
 
-    return (<div>
-        <p>{author.username}</p>
-        {user.username === author.username && edit ?<div> 
-        <form onSubmit={(e) => {e.preventDefault(); submitEdit(post.id);}}>
-        <Textarea
-        {...EditPostForm.getInputProps('content')}
-        key={EditPostForm.key('content')}/>
-        <Button onClick={cancelEdit}>Cancel</Button>
-        <Button type="submit">Submit</Button>
-        </form>
-        <p>{post.createdAt}</p></div> : user.username === author.username && !edit ? 
-        <div> <p>{postContent}</p>
-        <p>{post.createdAt}</p>
-        <Button onClick={handleEdit}>Edit</Button>
-        <Button onClick={handleDelete}>Delete</Button></div> : 
-        <div> <p>{postContent}</p>
-        <p>{post.createdAt}</p></div>}
-        <p></p>
-        <p></p>
-        <p>Comment</p>
-        <form onSubmit={(e) => {e.preventDefault(); handleNewComment(post.id);}}>
-            <Textarea 
-      {...form.getInputProps('content')}
-      key={form.key('content')}
-    />
+    return ( <div>
+    <div>
+      <p>{author.username}</p>
+      {user.username === author.username && edit ? (
+        <div> 
+          <form onSubmit={(e) => {e.preventDefault(); submitEdit(post.id);}}>
+            <Textarea {...EditPostForm.getInputProps('content')} key={EditPostForm.key('content')} />
+            <Button onClick={cancelEdit}>Cancel</Button>
             <Button type="submit">Submit</Button>
-        </form>
-        <div>{commentscards}</div>
-    </div>)
+          </form>
+          <p>{post.createdAt}</p>
+        </div>
+      ) : user.username === author.username && !edit ? (
+        <div> 
+          <p>{postContent}</p>
+          <p>{post.createdAt}</p>
+          <Button onClick={handleEdit}>Edit</Button>
+          <Button onClick={handleDelete}>Delete</Button>
+        </div>
+      ) : (
+        <div> 
+          <p>{postContent}</p>
+          <p>{post.createdAt}</p>
+        </div>
+      )}
+      <div className="flex flex-row gap-4">
+      <div  className="flex flex-row gap-1">
+      {likes.some((liker) => {return user.username === liker.username}) ? (
+        <button onClick={() => handleLike(post.id)} className="size-4">
+          <img src={heartBlack} alt="Button Image" />
+        </button>
+      ) : (
+        <button onClick={() => handleLike(post.id)} className="size-4">
+          <img src={heartOutline} alt="Button Image" />
+        </button>
+      )}
+      <p>{likes.length} like(s)</p>
+      </div>
+      <p>{comments.length} comment(s)</p>
+      </div>
+    </div>
+
+    <p>Comment</p>
+    <form onSubmit={(e) => {e.preventDefault(); handleNewComment(post.id);}}>
+      <Textarea {...form.getInputProps('content')} key={form.key('content')} />
+      <Button type="submit">Submit</Button>
+    </form>
+    <div>{commentscards}</div>
+  </div>)
 }
 
 const PostPage = () => {
