@@ -7,12 +7,10 @@ import { useForm } from "@mantine/form";
 import heartBlack from "../src/assets/heart-black.svg"
 import heartOutline from '../src/assets/heart-outline.svg';
 
-//redirect to new post page after making post
-
 const Post = ({id, content, author, createdAt, comment, like, handleLike, liked}) => {
     const postLink = `/post/${id}`
 
-    return (<div className="flex flex-col w-96">
+    return (<div className="flex flex-col w-96 border-2 rounded-xl border-indigo-500">
         <p>{content}</p>
         <p>Posted: {createdAt}</p>
         <p>By: {author}</p>
@@ -75,10 +73,8 @@ const Posts = () => {
                 body: JSON.stringify(formData),
                 }
             );
-            const data = post.json();
-            navigate(`/post/${data.id}`);
-            console.log(post);
-
+            const data = await post.json();
+            navigate(`/post/${data.post.id}`);
         }
         catch(err) {
             console.error('Error making a new post', err);
@@ -156,7 +152,7 @@ const Posts = () => {
     <Button type="submit">Submit</Button>
     </div>
     </form>
-    <div className="flex flex-row items-center">{postscards}</div>
+    <div className="flex flex-col items-center">{postscards}</div>
     </div>)
 }
 

@@ -243,7 +243,6 @@ const Post = () => {
 
     return ( <div>
     <div>
-      <p>{author.username}</p>
       {user.username === author.username && edit ? (
         <div> 
           <form onSubmit={(e) => {e.preventDefault(); submitEdit(post.id);}}>
@@ -256,14 +255,16 @@ const Post = () => {
       ) : user.username === author.username && !edit ? (
         <div> 
           <p>{postContent}</p>
-          <p>{post.createdAt}</p>
+          <p>By: {author.username}</p>
+          <p>Posted: {post.createdAt}</p>
           <Button onClick={handleEdit}>Edit</Button>
           <Button onClick={handleDelete}>Delete</Button>
         </div>
       ) : (
         <div> 
           <p>{postContent}</p>
-          <p>{post.createdAt}</p>
+          <p>By: {author.username}</p>
+          <p>Posted: {post.createdAt}</p>
         </div>
       )}
       <div className="flex flex-row gap-4">

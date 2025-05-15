@@ -34,7 +34,20 @@ const Header = () => {
     ));
 
     const handleLogout = async () => {
-        
+         try {
+            await fetch("http://localhost:3000/logout",
+                {
+                method: "POST",
+                credentials: 'include',
+                mode: "cors",
+                }
+            );
+                removeAuth();
+                navigate("/");
+        }
+        catch(err) {
+            console.error('Error logging out', err);
+        }
     };
 
     return (<div>
@@ -46,7 +59,7 @@ const Header = () => {
                         <Link to="/">Home</Link>
                     </div>
                     <Group>{auth_items}
-            <Button onClick={handleLogout}>Log Out</Button>
+            <Button onClick={() => handleLogout()}>Log Out</Button>
             </Group>
                 </Flex>
             </Container>
