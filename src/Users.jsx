@@ -6,7 +6,7 @@ const User = ({username, profileId}) => {
 
     const profileLink = `/profile/${profileId}`
 
-    return (<div>
+    return (<div className="border-1 border-black w-80 text-center">
         <Link to={profileLink}>{username}</Link>
     </div>)
 }
@@ -41,7 +41,7 @@ const Users = () => {
         </div>
       )) : null;
       
-    return (<div>{userscards}</div>)
+    return (<div className="flex flex-col items-center">{userscards}</div>)
 }
 
 const UsersPage = () => {

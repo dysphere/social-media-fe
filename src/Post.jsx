@@ -19,7 +19,7 @@ const Comment = ({id, content, createdAt, author, edit,
         },
       });
 
-    return(<div>
+    return(<div className="flex flex-col">
         {user.username === author && edit ? 
         <form onSubmit={(e) => {e.preventDefault(); handleSubmitCommentEdit(id);}}>
             <Textarea/>
@@ -107,7 +107,8 @@ const Post = () => {
                 body: JSON.stringify(formData),
                 }
             );
-            console.log(comment);
+            const comment_data = await comment.json();
+            setComments(comments.push(comment_data.comment));
 
         }
         catch(err) {
@@ -201,8 +202,6 @@ const Post = () => {
 
     const CommentEdit = (id) => {}
 
-    //work on like function later
-
     const handleLike = async (id) => {
          try {
             await fetch(`http://localhost:3000/post/${id}/like`,
@@ -242,7 +241,7 @@ const Post = () => {
       )) : null;
 
     return ( <div>
-    <div>
+    <div className="flex flex-col items-center">
       {user.username === author.username && edit ? (
         <div> 
           <form onSubmit={(e) => {e.preventDefault(); submitEdit(post.id);}}>
@@ -289,7 +288,7 @@ const Post = () => {
       <Textarea {...form.getInputProps('content')} key={form.key('content')} />
       <Button type="submit">Submit</Button>
     </form>
-    <div>{commentscards}</div>
+    <div className="flex flex-col items-center">{commentscards}</div>
   </div>)
 }
 

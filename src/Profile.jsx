@@ -28,7 +28,7 @@ const Profile = () => {
     const [profile, setProfile] = useState({});
     const [person, setPerson] = useState({});
     const [bio, setBio] = useState("");
-    const [follows, setFollows] = useState([]);
+    const [following, setFollowing] = useState();
     const [posts, setPosts] = useState([]);
     const [error, setError] = useState(false);
     const [load, setLoading] = useState(true);
@@ -41,11 +41,10 @@ const Profile = () => {
                  })
               .then((response) => response.json())
               .then((response) => {
-                console.log(response.profile.user.followedBy);
                 setProfile(response.profile); 
                 setBio(response.profile.bio); 
                 setPerson(response.profile.user); 
-                setFollows(response.profile.user.followedBy); 
+                setFollowing(response.isFollowing); 
                 setPosts(response.profile.user.posts); 
                 form.setFieldValue('bio', response.profile.bio);})
               .catch((error) => setError(error))
@@ -54,14 +53,19 @@ const Profile = () => {
 
     const toggleFollow = async (id) => {
     try {
-        const follow = await fetch(`http://localhost:3000/user/${id}/follow`,
+        await fetch(`http://localhost:3000/user/${id}/follow`,
             {
             mode: "cors" ,
             credentials: 'include',
             method: "POST",
             }
         );
-        console.log(follow);
+        if (following) {
+            setFollowing(false);
+        }
+        else {
+            setFollowing(true);
+        }
 
     }
     catch(err) {
@@ -125,8 +129,9 @@ const Profile = () => {
         <img
   src={profile.avatar} />
   <div className="flex flex-col">
-  <p>{user.username}</p>
-  <Button onClick={() => toggleFollow(user.id)}>Follow</Button>
+  <p>{person.username}</p>
+  {following? <Button onClick={() => toggleFollow(person.id)}>Unfollow</Button> : 
+  <Button onClick={() => toggleFollow(person.id)}>Follow</Button>}
   </div>
  {user.username === person.username && edit ? 
  <form onSubmit={(e) => {e.preventDefault(); submitEdit(profile.id);}}>

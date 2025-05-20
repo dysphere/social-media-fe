@@ -10,7 +10,7 @@ import heartOutline from '../src/assets/heart-outline.svg';
 const Post = ({id, content, author, createdAt, comment, like, handleLike, liked}) => {
     const postLink = `/post/${id}`
 
-    return (<div className="flex flex-col w-96 border-2 rounded-xl border-indigo-500">
+    return (<div className="flex flex-col w-96 border-2 p-6 rounded-xl border-indigo-500">
         <p>{content}</p>
         <p>Posted: {createdAt}</p>
         <p>By: {author}</p>
@@ -81,48 +81,40 @@ const Posts = () => {
         }
     }
 
+    const like_include = (id) => posts.some(
+      (post) => post.id === id &&
+        post.like.some((liker) => liker.username === user.username)
+    );
+
     const ToggleLike = async (id) => {
-        try {
-            await fetch(`http://localhost:3000/post/${id}/like`,
-                {
-                mode: "cors" ,
-                credentials: 'include',
-                method: "PUT",
-                }
-            );
-            const like_include_user = like_include(id);
-            if (like_include_user) {
-                  setPosts(posts.map((post) => {
-                    if (post.id === id) {
-                        return {
-                            ...post,
-                            like: post.like.filter((liker) => 
-                                liker.username !== user.username),
-                            };
-                        }
-                        return post;
-                        }));
-            }
-            else {
-                 setPosts(posts.map((post) => {
-                    if (post.id === id) {
-                    return {
-                        ...post,
-                        like: [...post.like, { user: user }], 
-                    };
-                    }
-                    return post;
-                }));
-            }
-        }
+         try {
+    await fetch(`http://localhost:3000/post/${id}/like`, {
+      mode: "cors",
+      credentials: 'include',
+      method: "PUT",
+    });
+
+    const liked = posts.some(
+      (post) => post.id === id &&
+        post.like.some((liker) => liker.username === user.username)
+    );
+
+    setPosts(posts.map((post) => {
+      if (post.id !== id) return post;
+
+      const updatedLikes = liked
+        ? post.like.filter((liker) => liker.username !== user.username)
+        : [...post.like, { user: user }]; 
+
+      return {
+        ...post,
+        like: updatedLikes,
+      };
+    }));
+  }
         catch(err) {
             console.error('Error toggling like', err);
         }
-    }
-
-    const like_include = (id) => {
-        return posts.some((post) => {return post.id === id && 
-            post.like.some((liker) => {return user.username === liker.username})});
     }
 
     const postscards = 
@@ -152,7 +144,7 @@ const Posts = () => {
     <Button type="submit">Submit</Button>
     </div>
     </form>
-    <div className="flex flex-col items-center">{postscards}</div>
+    <div className="flex flex-col items-center gap-6 my-8 h-full max-h-9/10 overflow-scroll">{postscards}</div>
     </div>)
 }
 

@@ -21,7 +21,7 @@ const Signup = () => {
         try {
             event.preventDefault();
             const formData = form.getValues();
-            await fetch("http://localhost:3000/signup",
+            const response = await fetch("http://localhost:3000/signup",
                 {
                 method: "POST",
                 headers: {
@@ -30,7 +30,12 @@ const Signup = () => {
                 body: JSON.stringify(formData),
                 }
             );
-            navigate("/login");
+            await response.json();
+             if (response.ok) {
+                navigate("/login");
+            } else {
+                console.error("Error signing up");
+            }
 
         }
         catch(err) {
