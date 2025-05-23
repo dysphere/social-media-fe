@@ -12,13 +12,6 @@ const Comment = ({id, content, createdAt, author, edit,
 
     const { user } = useContext(AuthContext);
 
-    const form = useForm({
-        mode: "uncontrolled",
-        initialValues: {
-          content: content,
-        },
-      });
-
     return(<div className="flex flex-col">
         {user.username === author && edit ? 
         <form onSubmit={(e) => {e.preventDefault(); handleSubmitCommentEdit(id);}}>
@@ -169,6 +162,7 @@ const Post = () => {
             if (id === comment.id) {
                 return {...comment, edit: true};
             }
+            return comment;
         }));
     }
 
@@ -177,6 +171,7 @@ const Post = () => {
             if (id === comment.id) {
                 return {...comment, edit: false};
             }
+            return comment;
         }));
     }
 
@@ -190,7 +185,7 @@ const Post = () => {
                 }
             );
             setComments(comments.filter((comment) => {
-                comment.id != id
+                return comment.id != id
             }));
 
         }
@@ -198,8 +193,22 @@ const Post = () => {
             console.error('Error deleting comment', err);
         }
     }
-
-    const CommentEdit = (id) => {}
+/*
+    const CommentEdit = async (id) => {
+        try {
+            await fetch(`http://localhost:3000/comment/${id}/like`,
+                {
+                mode: "cors" ,
+                credentials: 'include',
+                method: "PUT",
+                }
+            );
+        }
+        catch(err) {
+            console.error('Error toggling like', err);
+        }
+        }
+        */
 
     const handleLike = async (id) => {
          try {
