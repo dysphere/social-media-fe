@@ -7,7 +7,10 @@ import { useForm } from "@mantine/form";
 import heartBlack from "../src/assets/heart-black.svg"
 import heartOutline from '../src/assets/heart-outline.svg';
 
-const Post = ({id, content, author, createdAt, comment, like, handleLike, liked}) => {
+//need to lift state up from child to get liked and change like state for posts 
+//set post.liked state too when fetching posts
+
+const Post = ({id, content, author, createdAt, comment, likeCount, handleLike, liked}) => {
     const postLink = `/post/${id}`
 
     return (<div className="flex flex-col w-96 border-2 p-6 rounded-xl border-indigo-500">
@@ -22,7 +25,7 @@ const Post = ({id, content, author, createdAt, comment, like, handleLike, liked}
         <button onClick={handleLike} className="size-4">
   <img src={heartOutline} alt="Button Image"/>
     </button>}
-    <p>{like} like(s)</p>
+    <p>{likeCount} like(s)</p>
     </div>
     <Link to={postLink}>{comment} comment(s)</Link>
     </div>
@@ -35,6 +38,8 @@ const Posts = () => {
     const { user } = useContext(AuthContext);
 
     const [posts, setPosts] = useState([]);
+    const [likes, setLikes] = useState([]);
+    const [liked, setLiked] = useState([]);
     const [error, setError] = useState(false);
     const [load, setLoading] = useState(true);
 
@@ -46,6 +51,22 @@ const Posts = () => {
         })
           .then((response) => response.json())
           .then((response) => {console.log(response.posts); 
+            console.log(response.posts.reduce((acc, post) => {
+                acc[post.id] = post.like;
+                return acc;
+                }, {}));
+            console.log(response.posts.reduce((acc, post) => {
+                acc[post.id] = post.like.some((like) => like.username === user.username);
+                return acc;
+                }, {}));
+            setLikes(response.posts.reduce((acc, post) => {
+                acc[post.id] = post.like;
+                return acc;
+                }, {}));
+            setLiked(response.posts.reduce((acc, post) => {
+                acc[post.id] = post.like.some((like) => like.username === user.username);
+                return acc;
+                }, {}));
             setPosts(response.posts);})
           .catch((error) => setError(error))
           .finally(() => setLoading(false));
@@ -81,41 +102,29 @@ const Posts = () => {
         }
     }
 
-    const like_include = (id) => posts.some(
-      (post) => post.id === id &&
-        post.like.some((liker) => liker.username === user.username)
-    );
+   const ToggleLike = async (id) => {
+        try {
+            await fetch(`http://localhost:3000/post/${id}/like`, {
+            mode: "cors",
+            credentials: 'include',
+            method: "PUT",
+                }); 
+          const isLiked = liked[id];
+          if (isLiked) {
+            setLiked({...liked, [id]: false});
+            setLikes({...likes, [id]: likes[id].filter((like) => like.username != user.username)});
+          }
+          else {
+            setLiked({...liked, [id]: true});
+            setLikes({...likes, [id]: [...likes[id], user]});
+          }
 
-    const ToggleLike = async (id) => {
-         try {
-    await fetch(`http://localhost:3000/post/${id}/like`, {
-      mode: "cors",
-      credentials: 'include',
-      method: "PUT",
-    });
-
-    const liked = posts.some(
-      (post) => post.id === id &&
-        post.like.some((liker) => liker.username === user.username)
-    );
-
-    setPosts(posts.map((post) => {
-      if (post.id !== id) return post;
-
-      const updatedLikes = liked
-        ? post.like.filter((liker) => liker.username !== user.username)
-        : [...post.like, { user: user }]; 
-
-      return {
-        ...post,
-        like: updatedLikes,
-      };
-    }));
-  }
+        }
         catch(err) {
             console.error('Error toggling like', err);
         }
-    }
+    } 
+        
 
     const postscards = 
           !error && !load && posts ? posts.map((post) => (
@@ -126,9 +135,9 @@ const Posts = () => {
                 createdAt={post.createdAt}
                 author={post.author.username}
                 comment={post.comment.length}
-                like={post.like.length}
-                handleLike={() => ToggleLike(post.id)}
-                liked={like_include(post.id)}
+                likeCount={likes[post.id].length} 
+                handleLike={() => ToggleLike(post.id)} 
+                liked={liked[post.id]} 
                 />
             </div>
           )) : null;

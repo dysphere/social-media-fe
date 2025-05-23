@@ -61,7 +61,6 @@ const Post = () => {
             const comment_edit = response.post.comment.map((comment) => {
                 return {...comment, edit: false};
             });
-            console.log(response.post.like);
             setPost(response.post); 
             setPostContent(response.post.content); 
             setLikes(response.post.like); 
@@ -108,8 +107,8 @@ const Post = () => {
                 }
             );
             const comment_data = await comment.json();
-            setComments(comments.push(comment_data.comment));
-
+            comment_data.edit = false;
+            setComments([...comments, comment_data.comment]);
         }
         catch(err) {
             console.error('Error making a new comment', err);
