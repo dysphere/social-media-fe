@@ -7,9 +7,6 @@ import { useForm } from "@mantine/form";
 import heartBlack from "../src/assets/heart-black.svg"
 import heartOutline from '../src/assets/heart-outline.svg';
 
-//need to lift state up from child to get liked and change like state for posts 
-//set post.liked state too when fetching posts
-
 const Post = ({id, content, author, createdAt, comment, likeCount, handleLike, liked}) => {
     const postLink = `/post/${id}`
 
@@ -50,15 +47,7 @@ const Posts = () => {
             credentials: 'include',
         })
           .then((response) => response.json())
-          .then((response) => {console.log(response.posts); 
-            console.log(response.posts.reduce((acc, post) => {
-                acc[post.id] = post.like;
-                return acc;
-                }, {}));
-            console.log(response.posts.reduce((acc, post) => {
-                acc[post.id] = post.like.some((like) => like.username === user.username);
-                return acc;
-                }, {}));
+          .then((response) => {
             setLikes(response.posts.reduce((acc, post) => {
                 acc[post.id] = post.like;
                 return acc;
