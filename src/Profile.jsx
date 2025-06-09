@@ -126,7 +126,8 @@ const ToggleLike = async (id) => {
         comment={post.comment.length}
        likeCount={likes[post.id].length} 
         handleLike={() => ToggleLike(post.id)} 
-        liked={liked[post.id]} 
+        liked={liked[post.id]}
+        author={person.username} 
         />
     </div>
     )) : null;
@@ -189,7 +190,7 @@ const ToggleLike = async (id) => {
  user.username === person.username && !edit ?
  <div><p>{bio}</p>
  <Button onClick={handleEdit}>Edit</Button></div> : <p>{bio}</p>}
-  <div>{postscards}</div>
+  <div className="flex flex-col gap-6 mt-10">{postscards}</div>
     </div>)
 }
 

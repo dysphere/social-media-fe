@@ -29,7 +29,7 @@ const Comment = ({id, content, createdAt, author, edit,
       }, [CommentEditForm, contentRef]);
 
 
-    return(<div className="flex flex-col">
+    return(<div className="flex flex-col border-2 border-indigo-500 rounded-xl p-4 gap-1">
         {user.username === author && edit ? 
         <form onSubmit={(e) => {e.preventDefault(); handleSubmitCommentEdit(id);}}>
             <Textarea
@@ -42,10 +42,11 @@ const Comment = ({id, content, createdAt, author, edit,
             <p>{content}</p>
             <Button onClick={handleEditComment}>Edit</Button>
             <Button onClick={handleDeleteComment}>Delete</Button>
-            </div> :
+            </div>
+             :
         <p>{content}</p> }
-        <p>{createdAt}</p>
-        <p>{author}</p>
+        <p>Posted: {createdAt}</p>
+        <p>By: {author}</p>
     </div>)
 }
 
@@ -329,12 +330,18 @@ const Post = () => {
       </div>
     </div>
 
-    <p>Comment</p>
+    <p className="text-center">Comment</p>
     <form onSubmit={(e) => {e.preventDefault(); handleNewComment(post.id);}}>
+      <div className="flex flex-col justify-center items-center">
+        <div className="max-w-96">
       <Textarea {...form.getInputProps('content')} key={form.key('content')} />
+      </div>
+      <div>
       <Button type="submit">Submit</Button>
+      </div>
+      </div>
     </form>
-    <div className="flex flex-col items-center">{commentscards}</div>
+    <div className="flex flex-col items-center gap-6 mt-10">{commentscards}</div>
   </div>)
 }
 
