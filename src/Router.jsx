@@ -1,4 +1,5 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import RequireAuth from "./Auth";
 import Home from './Home';
 import Signup from './Signup';
 import Login from './Login';
@@ -25,19 +26,23 @@ const Router = () => {
       },
       {
         path: 'posts',
-        element: <Posts/>,
+        element: (
+          <RequireAuth><Posts/></RequireAuth>),
       },
       {
         path: 'post/:id',
-        element: <Post/>
+        element: (
+        <RequireAuth><Post/></RequireAuth>)
       },
       {
         path: 'users',
-        element: <Users/>,
+        element: (
+        <RequireAuth><Users/></RequireAuth>),
       },
       {
         path: 'profile/:id',
-        element: <Profile/>
+        element: (
+        <RequireAuth><Profile/></RequireAuth>)
       },
     ]);
   

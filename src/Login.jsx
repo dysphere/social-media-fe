@@ -1,6 +1,6 @@
 import { useContext, useEffect } from 'react';
 import { AuthContext } from './AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Flex, Button, TextInput, PasswordInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import Header from './Header';
@@ -8,6 +8,7 @@ import Header from './Header';
 const Login = () => {
 
     const { addAuth } = useContext(AuthContext);
+    const { state } = useLocation();
     let navigate = useNavigate();
 
     const form = useForm({
@@ -37,7 +38,7 @@ const Login = () => {
             await response.json();
             if (response.ok) {
                 addAuth();
-                navigate("/");
+                navigate(state?.path || "/");
             } else {
                 console.error("Error logging in");
             }
