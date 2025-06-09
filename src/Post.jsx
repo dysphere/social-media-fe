@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react"
+import React, { useEffect, useState, useContext, useRef } from "react"
 import { AuthContext } from "./AuthContext"
 import { useParams } from "react-router-dom"
 import Header from "./Header"
@@ -8,14 +8,33 @@ import heartBlack from "../src/assets/heart-black.svg"
 import heartOutline from '../src/assets/heart-outline.svg';
 
 const Comment = ({id, content, createdAt, author, edit, 
-    handleEditComment, handleDeleteComment, handleSubmitCommentEdit, handleCancelForm}) => {
+    handleEditComment, handleDeleteComment, handleSubmitCommentEdit, 
+    handleCancelForm, contentRef}) => {
 
     const { user } = useContext(AuthContext);
+
+    const CommentEditForm = useForm({
+        mode: 'uncontrolled',
+        initialValues: {
+          content: content,
+        },
+      });
+
+       useEffect(() => {
+        if (contentRef) {
+          contentRef.current = {
+            getContent: () => CommentEditForm.getValues().content,
+          };
+        }
+      }, [CommentEditForm, contentRef]);
+
 
     return(<div className="flex flex-col">
         {user.username === author && edit ? 
         <form onSubmit={(e) => {e.preventDefault(); handleSubmitCommentEdit(id);}}>
-            <Textarea/>
+            <Textarea
+             {...CommentEditForm.getInputProps('content')}
+            key={CommentEditForm.key('content')}/>
             <Button onClick={handleCancelForm}>Cancel</Button>
             <Button type="submit">Submit</Button>
         </form> : user.username === author && !edit ? 
@@ -34,6 +53,8 @@ const Post = () => {
 
     const { id } = useParams();
     const { user } = useContext(AuthContext);
+
+    const contentRefs = useRef({});
 
     const [post, setPost] = useState({});
     const [postContent, setPostContent] = useState("");
@@ -54,6 +75,7 @@ const Post = () => {
             const comment_edit = response.post.comment.map((comment) => {
                 return {...comment, edit: false};
             });
+            console.log(comment_edit);
             setPost(response.post); 
             setPostContent(response.post.content); 
             setLikes(response.post.like); 
@@ -65,13 +87,6 @@ const Post = () => {
       }, [id]);
 
       const EditPostForm = useForm({
-        mode: 'uncontrolled',
-        initialValues: {
-          content: '',
-        },
-      });
-
-      const EditCommentForm = useForm({
         mode: 'uncontrolled',
         initialValues: {
           content: '',
@@ -193,22 +208,36 @@ const Post = () => {
             console.error('Error deleting comment', err);
         }
     }
-/*
+
     const CommentEdit = async (id) => {
         try {
-            await fetch(`http://localhost:3000/comment/${id}/like`,
-                {
-                mode: "cors" ,
-                credentials: 'include',
+          const refObj = contentRefs.current[id];
+          const content = refObj?.current?.getContent?.(); 
+          if (content !== undefined) {
+            const comment = await fetch(`http://localhost:3000/comment/${id}/update`,
+               {
                 method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                  },
+                credentials: 'include',
+                mode: "cors",
+                body: JSON.stringify({content}),
                 }
             );
+            const commentData = await comment.json();
+            setComments(comments.map((comment) => {
+            if (id === comment.id) {
+                return {...comment, content: commentData.comment.content, edit: false};
+            }
+            return comment;
+        }));
+          }
         }
         catch(err) {
-            console.error('Error toggling like', err);
+            console.error('Error editing comment', err);
         }
         }
-        */
 
     const handleLike = async (id) => {
          try {
@@ -233,20 +262,29 @@ const Post = () => {
     }
 
     const commentscards = 
-      !error && !load && comments ? comments.map((comment) => (
-        <div key={comment.id}>
-            <Comment
-            content={comment.content}
-            createdAt={comment.createdAt}
-            author={comment.author.username}
-            edit={comment.edit}
-            id={comment.id}
-            handleEditComment={() => CommentStartEdit(comment.id)}
-            handleDeleteComment={() => CommentDelete(comment.id)}
-            handleSubmitCommentEdit={() => CommentEdit(comment.id)}
-            handleCancelForm={() => CommentFormCancel(comment.id)}/>
-        </div>
-      )) : null;
+      !error && !load && comments ? comments.map((comment) => {
+          if (!contentRefs.current[comment.id]) {
+            contentRefs.current[comment.id] = React.createRef();
+          }
+
+          return (
+            <div key={comment.id}>
+              <Comment
+                id={comment.id}
+                content={comment.content}
+                createdAt={comment.createdAt}
+                author={comment.author.username}
+                edit={comment.edit}
+                contentRef={contentRefs.current[comment.id]} // 👈 pass ref
+                handleEditComment={() => CommentStartEdit(comment.id)}
+                handleDeleteComment={() => CommentDelete(comment.id)}
+                handleSubmitCommentEdit={() => CommentEdit(comment.id)}
+                handleCancelForm={() => CommentFormCancel(comment.id)}
+              />
+            </div>
+          );
+        })
+      : null;
 
     return ( <div>
     <div className="flex flex-col items-center">

@@ -48,6 +48,8 @@ const Login = () => {
         }
     }
 
+    //create guest login by having premade account with credentials filled out
+
     return (<div className='flex justify-center'>
         <form onSubmit={handleLogin}>
             <TextInput
