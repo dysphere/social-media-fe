@@ -49,8 +49,6 @@ const Login = () => {
         }
     }
 
-    //create guest login by having premade account with credentials filled out
-
     return (<div className='flex justify-center'>
         <form onSubmit={handleLogin}>
             <TextInput
@@ -72,13 +70,56 @@ const Login = () => {
     </div>)
 }
 
+const GuestLogin = () => {
+
+    const { addAuth } = useContext(AuthContext);
+    const { state } = useLocation();
+    let navigate = useNavigate();
+
+    const handleGuestLogin = async (event) => {
+        try {
+            event.preventDefault();
+            const response = await fetch("http://localhost:3000/login",
+                {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                  },
+                credentials: 'include',
+                mode: "cors",
+                body: JSON.stringify({"username": "Guest", "password": "GuestPassword"}),
+                }
+            );
+            await response.json();
+            if (response.ok) {
+                addAuth();
+                navigate(state?.path || "/");
+            } else {
+                console.error("Error logging in");
+            }
+
+        }
+        catch(err) {
+            console.error('Error logging in', err);
+        }
+    }
+
+    return (<div>
+        <form onSubmit={handleGuestLogin}>
+                <Button type="submit">Guest Log In</Button>
+            </form></div>)
+}
+
 const LoginPage = () => {
     return (
         <div>
-            <Flex direction="column">
+            <div className='flex flex-col'>
             <Header></Header>
+            <div className='flex justify-center items-center mt-20 gap-20'>
             <Login></Login>
-            </Flex>
+            <GuestLogin></GuestLogin>
+            </div>
+            </div>
         </div>
     );
 }
