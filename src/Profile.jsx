@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useRef } from "react";
 import { AuthContext } from "./AuthContext";
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
@@ -44,6 +44,10 @@ const Profile = () => {
     const [error, setError] = useState(false);
     const [load, setLoading] = useState(true);
     const [edit, setEdit] = useState(false);
+    const [editPic, setEditPic] = useState(false);
+
+    const PicForm = new FormData();
+    const PicRef = useRef();
 
      useEffect(() => {
             fetch(`http://localhost:3000/profile/${id}`,
@@ -52,7 +56,6 @@ const Profile = () => {
                  })
               .then((response) => response.json())
               .then((response) => {
-                console.log(response.profile);
                 setProfile(response.profile); 
                 setBio(response.profile.bio); 
                 setPerson(response.profile.user); 
@@ -171,9 +174,55 @@ const ToggleLike = async (id) => {
         }
     }
 
+    const handlePicUpload = () => {
+        setEditPic(true);
+    }
+
+    const cancelPicUpload = () => {
+        setEditPic(false);
+    }
+
+    const submitPic = async (id) => {
+         try {
+            const pic = PicRef.current.files[0];
+            PicForm.append('avatar', pic);
+            if (!pic) {
+                setEditPic(false);
+            }
+            else {
+            const profile = await fetch(`http://localhost:3000/profile/${id}/upload`,
+                {
+                mode: "cors" ,
+                credentials: 'include',
+                method: "PUT",
+                body: PicForm,
+                }
+            );
+            const data = await profile.json();
+            setProfile({...profile, avatar: data.profile.avatar});
+            setEditPic(false);
+            }
+
+        }
+        catch(err) {
+            console.error('Error editing profile', err);
+        }
+    }
+
     return (<div className="flex flex-col items-center">
         <img
   src={profile.avatar} />
+  {user.username === person.username && editPic ? 
+  <div>
+    <form  onSubmit={(e) => {e.preventDefault(); submitPic(profile.id);}} enctype="multipart/form-data">
+  <input type="file" ref={PicRef} id="avatar" name="avatar" accept="image/*"/>
+  <Button type="submit">Submit</Button>
+  <Button onClick={cancelPicUpload}>Cancel</Button>
+</form>
+  </div> : user.username && !editPic ?
+  <div>
+    <Button onClick={handlePicUpload}>Change Avatar</Button>
+  </div> : null}
   <div className="flex flex-col">
   <p>{person.username}</p>
   {following? <Button onClick={() => toggleFollow(person.id)}>Unfollow</Button> : 
