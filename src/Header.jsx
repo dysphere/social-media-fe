@@ -1,6 +1,6 @@
-import { useContext, useEffect } from "react";
-import { AuthContext } from "./AuthContext";
-import { Menu, Center, Container, Burger, Group, Flex, Popover, NavLink, Button } from '@mantine/core';
+import { useContext} from "react";
+import { AuthContext } from "./auth/AuthContext";
+import {  Container,  Group, Flex, Button } from '@mantine/core';
 import { Link, useNavigate } from "react-router-dom";
 
 const Header = () => {

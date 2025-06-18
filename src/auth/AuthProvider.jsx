@@ -22,7 +22,7 @@ export const AuthProvider = ({children}) => {
           }
       )
         .then((response) => response.json())
-        .then((response) => {setUser(response.user); console.log(response.user);})
+        .then((response) => {setUser(response.user);})
         .catch((error) => console.error(error));
   }
     }, [isAuth]);

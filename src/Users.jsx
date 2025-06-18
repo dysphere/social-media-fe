@@ -27,7 +27,7 @@ const Users = () => {
             }
             return response.json();
           })
-          .then((response) => {console.log(response.users); setUsers(response.users);})
+          .then((response) => {setUsers(response.users);})
           .catch((error) => setError(error))
           .finally(() => setLoading(false));
       }, []);

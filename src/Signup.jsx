@@ -14,7 +14,11 @@ const Signup = () => {
           password: '',
           confirm_password: '',
         },
-    
+        validate: {
+             email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
+             confirmPassword: (value, values) =>
+        value !== values.password ? 'Passwords did not match' : null,
+        }
       });
 
     const handleSignup = async (event) => {

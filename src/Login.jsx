@@ -1,7 +1,7 @@
-import { useContext, useEffect } from 'react';
-import { AuthContext } from './AuthContext';
+import { useContext } from 'react';
+import { AuthContext } from './auth/AuthContext';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Flex, Button, TextInput, PasswordInput } from '@mantine/core';
+import { Button, TextInput, PasswordInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import Header from './Header';
 

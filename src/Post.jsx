@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext, useRef } from "react"
-import { AuthContext } from "./AuthContext"
-import { useParams } from "react-router-dom"
+import { AuthContext } from "./auth/AuthContext"
+import { useParams, useNavigate } from "react-router-dom"
 import Header from "./Header"
 import { Textarea, Button } from "@mantine/core"
 import { useForm } from "@mantine/form"
@@ -56,6 +56,7 @@ const Post = () => {
     const { user } = useContext(AuthContext);
 
     const contentRefs = useRef({});
+    let navigate = useNavigate();
 
     const [post, setPost] = useState({});
     const [postContent, setPostContent] = useState("");
@@ -76,7 +77,6 @@ const Post = () => {
             const comment_edit = response.post.comment.map((comment) => {
                 return {...comment, edit: false};
             });
-            console.log(comment_edit);
             setPost(response.post); 
             setPostContent(response.post.content); 
             setLikes(response.post.like); 
@@ -141,7 +141,7 @@ const Post = () => {
                 method: "DELETE",
                 }
             );
-
+            navigate("/posts");
         }
         catch(err) {
             console.error('Error deleting post', err);
@@ -165,7 +165,6 @@ const Post = () => {
             const postData = await post.json();
             setPostContent(postData.post.content);
             setEdit(false);
-            console.log(post);
 
         }
         catch(err) {
@@ -276,7 +275,7 @@ const Post = () => {
                 createdAt={comment.createdAt}
                 author={comment.author.username}
                 edit={comment.edit}
-                contentRef={contentRefs.current[comment.id]} // 👈 pass ref
+                contentRef={contentRefs.current[comment.id]} 
                 handleEditComment={() => CommentStartEdit(comment.id)}
                 handleDeleteComment={() => CommentDelete(comment.id)}
                 handleSubmitCommentEdit={() => CommentEdit(comment.id)}
@@ -303,8 +302,8 @@ const Post = () => {
           <p>{postContent}</p>
           <p>By: {author.username}</p>
           <p>Posted: {post.createdAt}</p>
-          <Button onClick={handleEdit}>Edit</Button>
-          <Button onClick={handleDelete}>Delete</Button>
+          <Button onClick={() => handleEdit(post.id)}>Edit</Button>
+          <Button onClick={() => handleDelete(post.id)}>Delete</Button>
         </div>
       ) : (
         <div> 

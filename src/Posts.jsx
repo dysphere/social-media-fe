@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "./AuthContext";
+import { AuthContext } from "./auth/AuthContext";
 import Header from "./Header";
 import { Link, useNavigate } from "react-router-dom";
 import { Textarea, Button } from "@mantine/core";
@@ -66,6 +66,9 @@ const Posts = () => {
         initialValues: {
           content: '',
         },
+         validate: {
+      content: (value) => (value.length > 300 ? 'Post can\'t exceed 300 characters.' : null),
+    },
       });
 
       const handleNewPost = async (event) => {
@@ -136,6 +139,7 @@ const Posts = () => {
             <div className="flex flex-col items-center">
          <Textarea
       label="New Post"
+      error="Posts can\'t exceed 300 characters"
       {...form.getInputProps('content')}
       key={form.key('content')}
     />

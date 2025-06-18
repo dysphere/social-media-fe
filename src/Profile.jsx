@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext, useRef } from "react";
-import { AuthContext } from "./AuthContext";
+import { AuthContext } from "./auth/AuthContext";
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import Header from "./Header";
@@ -211,7 +211,7 @@ const ToggleLike = async (id) => {
 
     return (<div className="flex flex-col items-center">
         <img
-  src={profile.avatar} />
+  src={profile.avatar} className="size-24"/>
   {user.username === person.username && editPic ? 
   <div>
     <form  onSubmit={(e) => {e.preventDefault(); submitPic(profile.id);}} enctype="multipart/form-data">
